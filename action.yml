@@ -1,0 +1,62 @@
+name: GitHub Math Lint
+description: Find math expressions that GitHub Markdown mangles before its math renderer sees them
+author: Cosmic Frontier Labs
+branding:
+  icon: alert-triangle
+  color: purple
+
+inputs:
+  paths:
+    description: Newline-separated glob patterns to scan
+    required: false
+    default: |-
+      **/*.md
+      **/*.markdown
+      **/*.mdx
+  exclude:
+    description: Newline-separated glob patterns to exclude
+    required: false
+    default: |-
+      **/.git/**
+      **/.worktrees/**
+      **/node_modules/**
+      **/vendor/**
+      **/target/**
+      **/dist/**
+      **/build/**
+  skip-extensions:
+    description: Comma- or newline-separated extensions to skip even when paths uses a broad glob
+    required: false
+    default: .tex,.sty,.cls
+  scan-pr-text:
+    description: Scan the pull request title and body when the event is a pull_request
+    required: false
+    default: "true"
+  fail-on-findings:
+    description: Fail the action after reporting every finding
+    required: false
+    default: "true"
+  annotations:
+    description: Emit GitHub file annotations in addition to the complete log, summary, and JSON report
+    required: false
+    default: "true"
+  max-annotations:
+    description: Maximum annotations to emit; other reporting remains complete
+    required: false
+    default: "50"
+  report-path:
+    description: JSON report path relative to the workspace; leave empty to disable
+    required: false
+    default: github-math-lint-report.json
+
+outputs:
+  findings-count:
+    description: Total findings across files and pull request text
+  files-scanned:
+    description: Number of files scanned
+  report-path:
+    description: JSON report path, or an empty string when disabled
+
+runs:
+  using: node20
+  main: dist/index.js

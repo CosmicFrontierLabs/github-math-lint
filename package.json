@@ -1,0 +1,26 @@
+{
+  "name": "github-math-lint",
+  "version": "1.0.0",
+  "private": true,
+  "description": "GitHub Action that finds Markdown preprocessing hazards in math expressions",
+  "type": "module",
+  "scripts": {
+    "build": "ncc build src/main.ts -o dist --minify --source-map",
+    "check-dist": "npm run build && git diff --exit-code -- dist/",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@actions/core": "^3.0.1",
+    "@actions/glob": "^0.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.0",
+    "@vercel/ncc": "^0.38.3",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

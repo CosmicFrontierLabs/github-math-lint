@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Exact package version to release, without a v prefix
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Validate version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          test "$(node -p 'require("./package.json").version')" = "$VERSION"
+          test "$(node -p 'require("./package-lock.json").version')" = "$VERSION"
+          ! git rev-parse "v$VERSION" >/dev/null 2>&1
+      - run: npm ci
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run check-dist
+      - name: Create immutable release and update major tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          major="v${VERSION%%.*}"
+          git tag "v$VERSION"
+          git push origin "v$VERSION"
+          gh release create "v$VERSION" --verify-tag --generate-notes --title "v$VERSION"
+          git tag --force "$major" "v$VERSION"
+          git push --force origin "refs/tags/$major"
