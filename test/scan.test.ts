@@ -55,6 +55,14 @@ describe("scanTarget", () => {
   it("does not apply the operator-line rule to math fences", () => {
     expect(scanTarget({ label: "fence.md", text: "```math\n+ \\mathrm{x}\n```" })).toEqual([]);
   });
+
+  it("allows absolute-value pipes outside Markdown tables", () => {
+    const findings = scanTarget({
+      label: "prose.md",
+      text: "The residual $|x - y|$ remains bounded.",
+    });
+    expect(findings).toEqual([]);
+  });
 });
 
 describe("hasSkippedExtension", () => {

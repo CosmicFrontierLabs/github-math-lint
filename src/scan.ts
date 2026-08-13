@@ -82,8 +82,13 @@ function scanRegion(target: ScanTarget, region: MathRegion): Finding[] {
   if (region.kind === "inline") {
     const lineStart = target.text.lastIndexOf("\n", region.sourceOffset - 1) + 1;
     const lineEndIndex = target.text.indexOf("\n", region.sourceOffset);
-    const line = target.text.slice(lineStart, lineEndIndex < 0 ? target.text.length : lineEndIndex);
-    if (line.includes("|")) {
+    const lineEnd = lineEndIndex < 0 ? target.text.length : lineEndIndex;
+    const outsideMath = [
+      target.text.slice(lineStart, region.sourceOffset - 1),
+      target.text.slice(region.sourceOffset + region.source.length + 1, lineEnd),
+    ].join("");
+    const isTableRow = /(?<!\\)\|/.test(outsideMath);
+    if (isTableRow) {
       for (const offset of occurrences(region.source, /(?<!\\)\|/g)) {
         findings.push(finding(target, "inline-math-table-pipe", "A raw | inside inline math splits a Markdown table cell; use \\vert or \\mid", region.sourceOffset + offset));
       }

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2 - 2026-08-13
+
+- Limit the raw-pipe rule to inline math on Markdown table rows.
+
 ## 1.0.1 - 2026-08-13
 
 - Run the action and its own workflows on Node.js 24.
